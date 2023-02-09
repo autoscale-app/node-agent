@@ -70,8 +70,8 @@ test("call record queue time on render", async () => {
   expect(dispatcher["buffer"]).toStrictEqual(
     new Map(
       Object.entries({
-        "946684800": [500, 1000],
-        "946684801": [1500],
+        "946684800": 1000,
+        "946684801": 1500,
       })
     )
   );

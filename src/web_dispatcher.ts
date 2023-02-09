@@ -1,7 +1,7 @@
 import { dispatch } from './request'
 import { debug } from './log'
 
-type Buffer = Map<string, number[]>
+type Buffer = Map<string, number>
 
 export class WebDispatcher {
   readonly id: string
@@ -9,22 +9,23 @@ export class WebDispatcher {
   private buffer: Buffer = new Map()
   private readonly ttl = 20
 
-  constructor (token: string) {
+  constructor(token: string) {
     this.id = token.slice(0, 7)
     this.token = token
   }
 
   add (
-    values: number[],
+    value: number,
     timestamp: string | number = (Date.now() / 1000).toFixed()
   ): void {
-    let current = this.buffer.get(String(timestamp))
+    timestamp = String(timestamp)
+    let next = this.buffer.get(timestamp)
 
-    if (current == null) {
-      current = []
+    if (next == null || (value > next)) {
+      next = value
     }
 
-    this.buffer.set(String(timestamp), current.concat(values))
+    this.buffer.set(timestamp, next)
   }
 
   prune (): void {
@@ -44,7 +45,7 @@ export class WebDispatcher {
   }
 
   async dispatch (): Promise<void> {
-    const payload = this.nextPayload()
+    const payload = this.buildPayload()
 
     if (payload.keys().next().done === true) {
       return
@@ -56,37 +57,38 @@ export class WebDispatcher {
       debug(await dispatch(body, this.token))
       await this.dispatch()
     } catch (err) {
-      for (const [timestamp, values] of payload) {
-        this.add(values, timestamp)
-      }
-
+      this.revertPayload(payload)
       console.log(`WebDispatcher[${this.id}]: Failed to dispatch`)
       debug(`WebDispatcher[${this.id}]:`, err)
     }
   }
 
-  nextPayload (): Buffer {
+  buildPayload (): Buffer {
     const payload = new Map()
-    const iterator = this.buffer.keys()
     const keys = []
+    const now = Math.floor(Date.now() / 1000)
 
-    for (let i = 0; i < 5; i++) {
-      const { value } = iterator.next()
-
-      if (value != null) {
-        keys.push(value)
+    for (const [timestamp, _] of this.buffer) {
+      if (timestamp !== '' && Number(timestamp) < now) {
+        keys.push(timestamp)
       }
     }
 
     for (const key of keys) {
-      const values = this.buffer.get(key)
+      const value = this.buffer.get(key)
 
-      if (values != null) {
-        payload.set(key, values)
+      if (value != null) {
+        payload.set(key, value)
         this.buffer.delete(key)
       }
     }
 
     return payload
+  }
+
+  revertPayload (payload: Buffer): void {
+    for (const [timestamp, values] of payload) {
+      this.add(values, timestamp)
+    }
   }
 }

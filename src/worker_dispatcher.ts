@@ -19,7 +19,7 @@ export class WorkerDispatcher {
     const timestamp = (Date.now() / 1000).toFixed()
 
     if (typeof value === 'number') {
-      const body = JSON.stringify({ [timestamp]: [value] })
+      const body = JSON.stringify({ [timestamp]: value })
 
       try {
         debug(await dispatch(body, this.token))

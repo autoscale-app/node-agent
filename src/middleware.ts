@@ -74,9 +74,9 @@ function recordQueueTime (agent: Agent, params: RequestParams): void {
   const elapsed = Date.now() - ms(agent, start)
 
   if (elapsed > 0) {
-    dispatcher.add([elapsed])
+    dispatcher.add(elapsed)
   } else {
-    dispatcher.add([0])
+    dispatcher.add(0)
   }
 }
 

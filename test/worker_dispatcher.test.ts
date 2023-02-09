@@ -1,5 +1,5 @@
 import nock from "nock";
-import { setup, CONSOLE, TOKEN, BASE_TIMESTAMP } from "./helpers";
+import { setup, travelTo, CONSOLE, TOKEN } from "./helpers";
 import { WorkerDispatcher } from "../src/worker_dispatcher";
 
 beforeEach(setup);
@@ -10,16 +10,16 @@ test("id", () => {
 });
 
 test("dispatch", async () => {
-  jest.spyOn(Date, "now").mockImplementation(() => BASE_TIMESTAMP * 1000);
+  travelTo("2000")
   const request = nock("https://metrics.autoscale.app", {
     reqheaders: {
       "user-agent": "Autoscale Agent (Node)",
       "content-type": "application/json",
-      "content-length": "20",
+      "content-length": "18",
       "autoscale-metric-token": "u4quBFgM72qun74EwashWv6Ll5TzhBVktVmicoWoXla",
     },
   })
-    .post("/", { "946684800": [1.23] })
+    .post("/", { "946684800": 1.23 })
     .reply(200, "", {});
   const dispatcher = new WorkerDispatcher(TOKEN, async () => 1.23);
   await dispatcher.dispatch();

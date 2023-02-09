@@ -1,7 +1,7 @@
 import type { WebDispatcher } from './web_dispatcher'
 
 export class WebDispatchers {
-  private readonly interval = 5000
+  private readonly interval = 15_000
   private readonly dispatchers: WebDispatcher[] = []
   queueTime?: WebDispatcher
 
