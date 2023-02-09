@@ -1,4 +1,4 @@
-import { PLATFORM, OPTIONS, TOKEN, setup, travel, travelTo } from "./helpers";
+import { PLATFORM, OPTIONS, TOKEN, setup, travel } from "./helpers";
 import { Agent } from "../src/agent";
 import { handle } from "../src/middleware";
 
@@ -50,7 +50,6 @@ test("serve 404", async () => {
 
 test("call record queue time on render", async () => {
   const agent = new Agent("render", OPTIONS).dispatch(TOKEN);
-  travelTo("2000");
   for (const [distance, start] of [
     [0, 500_000],
     [0, 1_000_000],

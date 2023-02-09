@@ -1,5 +1,5 @@
 import nock from "nock";
-import { setup, travelTo, CONSOLE, TOKEN } from "./helpers";
+import { setup, CONSOLE, TOKEN } from "./helpers";
 import { WorkerDispatcher } from "../src/worker_dispatcher";
 
 beforeEach(setup);
@@ -10,7 +10,6 @@ test("id", () => {
 });
 
 test("dispatch", async () => {
-  travelTo("2000")
   const request = nock("https://metrics.autoscale.app", {
     reqheaders: {
       "user-agent": "Autoscale Agent (Node)",

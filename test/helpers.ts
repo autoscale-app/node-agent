@@ -35,7 +35,7 @@ export function travel (distance: number) {
 
 export function setup () {
   jest.restoreAllMocks();
-  jest.useRealTimers();
+  travelTo("2000")
   nock.cleanAll();
   nock.disableNetConnect();
   CONSOLE = jest.spyOn(console, "log");

@@ -1,5 +1,5 @@
 import nock from "nock";
-import { CONSOLE, TOKEN, setup, travelTo, travel } from "./helpers";
+import { CONSOLE, TOKEN, setup, travel } from "./helpers";
 import { WebDispatcher } from "../src/web_dispatcher";
 
 beforeEach(setup);
@@ -12,7 +12,6 @@ test("id", () => {
 test("dispatch", async () => {
   const dispatcher = new WebDispatcher(TOKEN);
   const metrics = [[1], [0, 2, 1], [2, 1, 3], [1, 4, 3], [5, 4, 1], [6, 2, 6], [0, 3, 7]];
-  travelTo("2000")
   for (const i in metrics) {
     travel(1000)
     for (const metric of metrics[i] as number[]) {
@@ -42,7 +41,6 @@ test("dispatch", async () => {
 });
 
 test("dispatch 500", async () => {
-  travelTo("2000");
   const dispatcher = new WebDispatcher(TOKEN);
   const request = nock("https://metrics.autoscale.app").post("/").reply(500, "");
   dispatcher.add(1);
@@ -58,12 +56,11 @@ test("dispatch 500", async () => {
 });
 
 test("prune", async () => {
-  travelTo("2000");
   const dispatcher = new WebDispatcher(TOKEN);
   dispatcher.add(1);
-  travelTo("2000-01-01T00:00:30Z")
+  travel(30_000)
   dispatcher.add(1);
-  travelTo("2000-01-01T00:00:40Z")
+  travel(10_000)
   dispatcher.prune();
   expect(dispatcher["buffer"]).toStrictEqual(
     new Map(Object.entries({ "946684830": 1 }))
