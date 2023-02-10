@@ -7,7 +7,7 @@ export class WebDispatcher {
   readonly id: string
   readonly token: string
   private buffer: Buffer = new Map()
-  private readonly ttl = 20
+  private readonly ttl = 30
 
   constructor(token: string) {
     this.id = token.slice(0, 7)
